@@ -67,6 +67,11 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.4.6</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.25</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -98,7 +103,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.lab.LabApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
