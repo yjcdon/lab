@@ -1,22 +1,19 @@
 package com.lab.utils;
 
-import com.lab.entity.User;
+import com.lab.dto.UserAuthDto;
 
 public class UserUtil {
-    private static final ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<UserAuthDto> threadLocal = new ThreadLocal<>();
 
-    /*
-     * threadlocal 设置userid
-     * */
-    public static Integer getId () {
+    public static UserAuthDto get () {
         return threadLocal.get();
     }
 
-    public static void removeId () {
+    public static void remove () {
         threadLocal.remove();
     }
 
-    public static void set (Integer userId) {
-        threadLocal.set(userId);
+    public static void set (UserAuthDto userAuthDto) {
+        threadLocal.set(userAuthDto);
     }
 }
