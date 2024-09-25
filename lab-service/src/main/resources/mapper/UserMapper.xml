@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lab.mapper.UserMapper">
+    <select id="getByNameAndPsw" resultType="java.lang.Boolean">
+        SELECT COUNT(*)
+        FROM user
+        WHERE account = #{dto.account}
+          AND PASSWORD = #{dto.password}
+    </select>
+
+    <insert id="register">
+        INSERT INTO user(name, account, password, email, is_tutor, sex)
+        VALUES (#{dto.account}, #{dto.account}, #{dto.password}, #{dto.email}, #{dto.isTutor}, #{dto.sex});
+    </insert>
+
+    <select id="getById" resultType="com.lab.vo.UserSingleVo">
+        SELECT id, account, name, email, is_tutor as isTutor,sex
+        FROM user
+        WHERE id = #{id}
+    </select>
+    <select id="list" resultType="com.lab.vo.UserListVo">
+        SELECT id, account, name,email, is_tutor, sex
+        FROM user
+        <where>
+            <if test="dto.account != null and dto.account != ''">
+                and account like concat('%', #{dto.account},'%')
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and name like concat('%', #{dto.name},'%')
+            </if>
+            <if test="dto.isTutor != null and dto.isTutor != ''">
+                and is_tutor = #{dto.isTutor}
+            </if>
+            <if test="dto.sex != null and dto.account != ''">
+                and sex = #{dto.sex}
+            </if>
+        </where>
+    </select>
+
+    <update id="update">
+        UPDATE user
+        <set>
+            <if test="dto.name != null and dto.name != ''">
+                name = #{dto.name},
+            </if>
+            <if test="dto.account != null and dto.account != ''">
+                account = #{dto.account},
+            </if>
+            <if test="dto.email != null and dto.email != ''">
+                email = #{dto.email},
+            </if>
+            <if test="dto.sex != null and dto.sex != ''">
+                sex = #{dto.sex},
+            </if>
+            <if test="dto.isTutor != null and dto.isTutor != ''">
+                is_tutor = #{dto.isTutor},
+            </if>
+        </set>
+        WHERE id = #{dto.id}
+    </update>
+
+    <delete id="deleteByIds">
+        DELETE
+        FROM user
+        <where>
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+
+</mapper>

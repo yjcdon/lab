@@ -10,6 +10,7 @@ public class Response<T> {
 
     public static <T> Response<T> success () {
         Response<T> Response = new Response<T>();
+        Response.msg = "成功";
         Response.code = 1;
         return Response;
     }
@@ -17,6 +18,7 @@ public class Response<T> {
     public static <T> Response<T> success (T object) {
         Response<T> Response = new Response<T>();
         Response.data = object;
+        Response.msg = "成功";
         Response.code = 1;
         return Response;
     }

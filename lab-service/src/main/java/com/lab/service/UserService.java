@@ -16,15 +16,15 @@ import java.util.List;
  * Description:
  */
 public interface UserService {
-    String login (UserLoginDto userLoginDto);
+    boolean login (UserLoginDto userLoginDto);
 
-    String register (UserRegisterDto userRegisterDto);
+    boolean register (UserRegisterDto userRegisterDto);
 
     UserSingleVo getById (Integer id);
 
     Page<UserListVo> list (UserListDto userListDto);
 
-    String update (UserUpdateDto userUpdateDto);
+    boolean update (UserUpdateDto userUpdateDto);
 
-    String delete (List<Integer> ids);
+    boolean delete (List<Integer> ids);
 }

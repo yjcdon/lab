@@ -29,7 +29,7 @@ public class UserController {
     @ApiOperation("登录")
     @PostMapping("/login")
     public Response<String> login (@RequestBody UserLoginDto userLoginDto) {
-        return Response.success(userService.login(userLoginDto));
+        return userService.login(userLoginDto) ? Response.success("登录成功") : Response.error("登录失败");
     }
 
     /*
@@ -38,7 +38,7 @@ public class UserController {
     @ApiOperation("注册")
     @PostMapping("/register")
     public Response<String> register (@RequestBody UserRegisterDto userRegisterDto) {
-        return Response.success(userService.register(userRegisterDto));
+        return userService.register(userRegisterDto)? Response.success("注册成功") : Response.error("注册失败");
     }
 
     /*
@@ -65,7 +65,7 @@ public class UserController {
     @ApiOperation("修改用户信息")
     @PostMapping("/update")
     public Response<String> update (@RequestBody UserUpdateDto userUpdateDto) {
-        return Response.success(userService.update(userUpdateDto));
+        return userService.update(userUpdateDto)? Response.success("更新成功") : Response.error("更新失败");
     }
 
     /*
@@ -74,7 +74,7 @@ public class UserController {
     @ApiOperation("删除用户")
     @PostMapping("/delete")
     public Response<String> delete (@RequestParam("ids") List<Integer> ids) {
-        return Response.success(userService.delete(ids));
+        return userService.delete(ids)? Response.success("删除成功") : Response.error("删除失败");
     }
 
 }
