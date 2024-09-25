@@ -10,10 +10,13 @@ import com.lab.service.UserService;
 import com.lab.vo.UserListVo;
 import com.lab.vo.UserSingleVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -29,7 +32,17 @@ public class UserController {
     @ApiOperation("登录")
     @PostMapping("/login")
     public Response<String> login (@RequestBody UserLoginDto userLoginDto) {
-        return userService.login(userLoginDto) ? Response.success("登录成功") : Response.error("登录失败");
+        String uuid = userService.login(userLoginDto);
+        return !uuid.isEmpty() ? Response.success(uuid) : Response.error("登录失败");
+    }
+
+    /*
+     * 退出登录
+     * */
+    @ApiOperation("退出登录")
+    @GetMapping("/logout")
+    public Response<String> logout (HttpServletRequest request) {
+        return Response.success(userService.logout(request));
     }
 
     /*
@@ -38,7 +51,7 @@ public class UserController {
     @ApiOperation("注册")
     @PostMapping("/register")
     public Response<String> register (@RequestBody UserRegisterDto userRegisterDto) {
-        return userService.register(userRegisterDto)? Response.success("注册成功") : Response.error("注册失败");
+        return userService.register(userRegisterDto) ? Response.success("注册成功") : Response.error("注册失败");
     }
 
     /*
@@ -46,6 +59,9 @@ public class UserController {
      * */
     @ApiOperation("根据Id查询当前用户信息")
     @GetMapping("/getOne/{id}")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    })
     public Response<UserSingleVo> getById (@PathVariable Integer id) {
         return Response.success(userService.getById(id));
     }
@@ -65,7 +81,7 @@ public class UserController {
     @ApiOperation("修改用户信息")
     @PostMapping("/update")
     public Response<String> update (@RequestBody UserUpdateDto userUpdateDto) {
-        return userService.update(userUpdateDto)? Response.success("更新成功") : Response.error("更新失败");
+        return userService.update(userUpdateDto) ? Response.success("更新成功") : Response.error("更新失败");
     }
 
     /*
@@ -74,7 +90,7 @@ public class UserController {
     @ApiOperation("删除用户")
     @PostMapping("/delete")
     public Response<String> delete (@RequestParam("ids") List<Integer> ids) {
-        return userService.delete(ids)? Response.success("删除成功") : Response.error("删除失败");
+        return userService.delete(ids) ? Response.success("删除成功") : Response.error("删除失败");
     }
 
 }

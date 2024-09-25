@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lab.mapper.UserMapper">
-    <select id="getByNameAndPsw" resultType="java.lang.Boolean">
+    <select id="isExist" resultType="java.lang.Boolean">
         SELECT COUNT(*)
         FROM user
         WHERE account = #{dto.account}
@@ -37,6 +37,12 @@
                 and sex = #{dto.sex}
             </if>
         </where>
+    </select>
+    <select id="getIdByNameAndPassword" resultType="com.lab.dto.UserAuthDto">
+        select id as userId, is_tutor
+        from user
+        where account = #{dto.account}
+          and password = #{dto.password}
     </select>
 
     <update id="update">

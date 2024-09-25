@@ -1,5 +1,6 @@
 package com.lab.interceptor;
 
+import com.lab.constant.RedisConstant;
 import com.lab.dto.UserAuthDto;
 import com.lab.exception.LoginExcetion;
 import com.lab.utils.UserUtil;
@@ -27,12 +28,14 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle (HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("x-auth-token");
         if (token.isEmpty()) {
-            throw new LoginExcetion("未登录！");
+            response.setStatus(401);
+            return false;
         }
 
-        UserAuthDto dto = (UserAuthDto) redisTemplate.opsForValue().get(token);
+        UserAuthDto dto = (UserAuthDto) redisTemplate.opsForValue().get(RedisConstant.USER_LOGIN + token);
         if (dto == null) {
-            throw new LoginExcetion("未登录！");
+            response.setStatus(401);
+            return false;
         }
 
         // 把userId放入ThreadLocal中

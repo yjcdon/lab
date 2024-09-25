@@ -8,6 +8,7 @@ import com.lab.response.Page;
 import com.lab.vo.UserListVo;
 import com.lab.vo.UserSingleVo;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  * Description:
  */
 public interface UserService {
-    boolean login (UserLoginDto userLoginDto);
+    String login (UserLoginDto userLoginDto);
 
     boolean register (UserRegisterDto userRegisterDto);
 
@@ -27,4 +28,6 @@ public interface UserService {
     boolean update (UserUpdateDto userUpdateDto);
 
     boolean delete (List<Integer> ids);
+
+    String logout (HttpServletRequest request);
 }
