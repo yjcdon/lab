@@ -24,4 +24,5 @@ public interface TaskService {
     Page<TaskListVo> list (TaskListDto taskListDto);
 
     TaskSingleVo getById (Integer id);
+
 }
