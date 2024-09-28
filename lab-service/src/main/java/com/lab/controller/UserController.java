@@ -41,6 +41,9 @@ public class UserController {
      * */
     @ApiOperation("退出登录")
     @GetMapping("/logout")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    })
     public Response<String> logout (HttpServletRequest request) {
         return Response.success(userService.logout(request));
     }
@@ -71,6 +74,9 @@ public class UserController {
      * */
     @ApiOperation("分页查询用户信息")
     @PostMapping("/list")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    })
     public Response<Page<UserListVo>> list (@RequestBody UserListDto userListDto) {
         return Response.success(userService.list(userListDto));
     }
@@ -80,6 +86,9 @@ public class UserController {
      * */
     @ApiOperation("修改用户信息")
     @PostMapping("/update")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    })
     public Response<String> update (@RequestBody UserUpdateDto userUpdateDto) {
         return userService.update(userUpdateDto) ? Response.success("更新成功") : Response.error("更新失败");
     }
@@ -89,6 +98,9 @@ public class UserController {
      * */
     @ApiOperation("删除用户")
     @PostMapping("/delete")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    })
     public Response<String> delete (@RequestParam("ids") List<Integer> ids) {
         return userService.delete(ids) ? Response.success("删除成功") : Response.error("删除失败");
     }

@@ -5,18 +5,18 @@ spring:
 
 lab:
   datasource:
-    host: 192.168.88.137
+    host: mysql
     port: 3306
     database: lab
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
   redis:
-    host: 192.168.88.137
+    host: redis
     port: 6379
     password: 123456
   mq:
-    host: 192.168.88.137
+    host: rabbitmq
     port: 5672
     virtualHost: /lab
     username: lab

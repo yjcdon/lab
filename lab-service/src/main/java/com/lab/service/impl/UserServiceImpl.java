@@ -8,6 +8,7 @@ import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
 import com.lab.service.UserService;
 import com.lab.utils.PageUtil;
+import com.lab.utils.UserUtil;
 import com.lab.vo.UserListVo;
 import com.lab.vo.UserSingleVo;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -76,6 +77,7 @@ public class UserServiceImpl implements UserService {
     public String logout (HttpServletRequest request) {
         String key = RedisConstant.USER_LOGIN + request.getHeader("x-auth-token");
         redisTemplate.delete(key);
+        UserUtil.remove();
         return "退出成功";
     }
 }

@@ -18,7 +18,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
     public void addInterceptors (InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor) // 注册自定义拦截器
                 .addPathPatterns("/user/**") // 拦截的路径
-                .excludePathPatterns("/user/login"); // 排除的路径
+                .excludePathPatterns("/user/login","/user/register"); // 排除的路径
 
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/user/list", "/user/delete");
