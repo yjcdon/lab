@@ -27,7 +27,7 @@ public interface UserMapper {
 
     UserAuthDto getIdByNameAndPassword (@Param("dto") UserLoginDto userLoginDto);
 
-    String getNameById (@Param("id")Integer id);
+    String getNameById (@Param("id") Integer id);
 
-    List<String> getNamesByIds (@Param("ids") String[] ids);
+    List<String> getNamesByIds (@Param("ids") List<Integer> ids);
 }

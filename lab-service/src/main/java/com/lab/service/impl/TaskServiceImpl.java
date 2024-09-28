@@ -18,6 +18,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +75,12 @@ public class TaskServiceImpl implements TaskService {
         if (vo != null) {
             // 得到任务已分配的学生姓名
             String[] ids = vo.getTaskAssignedUserId().split(",");
-            List<String> names = userMapper.getNamesByIds(ids);
+
+            List<Integer> assignedUserIds = new ArrayList<>(ids.length);
+            for (String id2 : ids) {
+                assignedUserIds.add(Integer.parseInt(id2));
+            }
+            List<String> names = userMapper.getNamesByIds(assignedUserIds);
             vo.setTaskAssignedUserName(names);
 
             // 得到创建者和更新者的名字
@@ -98,7 +104,12 @@ public class TaskServiceImpl implements TaskService {
             for (TaskListVo vo : list) {
                 // 得到任务已分配的学生姓名
                 String[] ids = vo.getTaskAssignedUserId().split(",");
-                List<String> names = userMapper.getNamesByIds(ids);
+
+                List<Integer> assignedUserIds = new ArrayList<>(ids.length);
+                for (String id : ids) {
+                    assignedUserIds.add(Integer.parseInt(id));
+                }
+                List<String> names = userMapper.getNamesByIds(assignedUserIds);
                 vo.setTaskAssignedUserName(names);
 
                 // 得到创建者的名字

@@ -4,4 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lab.mapper.NotifyMapper">
 
+    <insert id="insertForTypeAdd">
+        INSERT INTO notify (content, user_id, notify_type)
+        VALUES (#{dto.content}, #{dto.userId}, #{dto.notifyType})
+
+    </insert>
 </mapper>

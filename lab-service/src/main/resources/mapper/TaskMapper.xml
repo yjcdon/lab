@@ -110,6 +110,16 @@
             </if>
         </where>
     </select>
+    <select id="getNamesByIds" resultType="java.lang.String">
+        select task_name
+        from task
+        <where>
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
 
 
 </mapper>

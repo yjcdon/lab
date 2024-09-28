@@ -11,10 +11,7 @@ public class NotifyAddDto {
     private String content;
 
     @ApiModelProperty("分配任务的用户ID")
-    private List<Integer> userId;
-
-    @ApiModelProperty("是否查看该消息")
-    private Integer isLook;
+    private Integer userId;
 
     @ApiModelProperty("通知类型，1新增任务，2删除任务，3修改任务")
     private Integer notifyType;
