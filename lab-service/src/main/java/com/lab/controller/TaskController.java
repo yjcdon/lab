@@ -30,8 +30,8 @@ public class TaskController {
             @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
     })
     public Response<String> add (@RequestBody TaskAddDto taskAddDto) {
-        Integer count = taskService.add(taskAddDto);
-        return count != null ? Response.success("添加成功") : Response.error("添加失败");
+        Integer taskId = taskService.add(taskAddDto);
+        return taskId > 0 ? Response.success("添加成功") : Response.error("添加失败");
     }
 
     @ApiOperation("删除任务")
@@ -41,7 +41,7 @@ public class TaskController {
     })
     public Response<String> delete (@RequestParam("ids") List<Integer> ids) {
         Integer count = taskService.delete(ids);
-        return count != null ? Response.success("删除成功") : Response.error("删除失败");
+        return count > 0 ? Response.success("成功删除 " + count + " 个任务") : Response.error("删除失败");
     }
 
     @ApiOperation("修改任务")
@@ -70,5 +70,19 @@ public class TaskController {
     public Response<Page<TaskListVo>> list (@RequestBody TaskListDto taskListDto) {
         return Response.success(taskService.list(taskListDto));
     }
+
+    // @ApiOperation("任务通知")
+    // @PostMapping("/notify")
+    // @ApiImplicitParams({
+    //     @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    // })
+    // public Response<>
+    //
+    // @ApiOperation("任务分配")
+    // @PostMapping("/assign")
+    // @ApiImplicitParams({
+    //     @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")
+    // })
+    // public Response<>
 
 }

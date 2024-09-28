@@ -3,6 +3,8 @@ package com.lab.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class TaskUpdateDto {
     @ApiModelProperty("任务主键ID")

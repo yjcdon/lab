@@ -1,8 +1,5 @@
 package com.lab.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.lab.constant.MqConstant;
-import com.lab.dto.NotifySendDto;
 import com.lab.dto.TaskAddDto;
 import com.lab.dto.TaskListDto;
 import com.lab.dto.TaskUpdateDto;
@@ -14,11 +11,11 @@ import com.lab.utils.PageUtil;
 import com.lab.utils.UserUtil;
 import com.lab.vo.TaskListVo;
 import com.lab.vo.TaskSingleVo;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,36 +26,16 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private UserMapper userMapper;
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Integer add (TaskAddDto taskAddDto) {
-        // 得到SQL影响行数
-        Integer count = taskMapper.add(taskAddDto);
-
-        // 如果插入成功，则异步发送通知
-        if (count != null && count > 0) {
-            NotifySendDto dto = new NotifySendDto();
-            dto.setCurrentUserId(UserUtil.get().getUserId());
-            dto.setId(Collections.singletonList(taskAddDto.getId()));
-            dto.setNotifyType(1);
-
-            BeanUtil.copyProperties(taskAddDto, dto, "id");
-
-            rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_ADD, dto);
-        }
-
-        return count;
+        return taskMapper.add(taskAddDto);
     }
 
     @Override
     public Integer delete (List<Integer> ids) {
-        Integer count = taskMapper.delete(ids);
-        if (count != null) {
-            NotifySendDto dto = new NotifySendDto();
-            dto.setCurrentUserId(UserUtil.get().getUserId());
-        }
-        return count;
+        return taskMapper.delete(ids);
     }
 
     @Override
