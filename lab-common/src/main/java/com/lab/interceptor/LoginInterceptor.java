@@ -2,7 +2,6 @@ package com.lab.interceptor;
 
 import com.lab.constant.RedisConstant;
 import com.lab.dto.UserAuthDto;
-import com.lab.exception.LoginExcetion;
 import com.lab.utils.UserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

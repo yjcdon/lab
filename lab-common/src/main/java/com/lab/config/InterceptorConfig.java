@@ -14,14 +14,34 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
     @Resource
     private AuthInterceptor authInterceptor;
 
+    // 未登录可以访问的路径
+    private static final String[] LOGIN_PATH = {
+            "/user/login",
+            "/user/register"
+    };
+
+    // 学生无法访问的路径
+    private static final String[] AUTH_PATH = {
+            "/user/list",
+            "/user/delete",
+
+            "/task/add",
+            "/task/delete",
+            "/task/update",
+            "/task/notify",
+    };
+
+
     @Override
     public void addInterceptors (InterceptorRegistry registry) {
+        // 登录拦截器
         registry.addInterceptor(loginInterceptor) // 注册自定义拦截器
-                .addPathPatterns("/user/**") // 拦截的路径
-                .excludePathPatterns("/user/login","/user/register"); // 排除的路径
+                .addPathPatterns("/user/**", "/task/**") // 拦截的路径
+                .excludePathPatterns(LOGIN_PATH); // 排除的路径
 
+        // 权限控制拦截器
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/user/list", "/user/delete");
+                .addPathPatterns(AUTH_PATH);
 
     }
 
