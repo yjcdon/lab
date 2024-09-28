@@ -26,4 +26,6 @@ public interface UserMapper {
     boolean deleteByIds (@Param("ids") List<Integer> ids);
 
     UserAuthDto getIdByNameAndPassword (@Param("dto") UserLoginDto userLoginDto);
+
+    String getNameById (@Param("id")Integer id);
 }

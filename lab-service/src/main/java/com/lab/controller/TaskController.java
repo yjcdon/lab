@@ -31,7 +31,7 @@ public class TaskController {
     })
     public Response<String> add (@RequestBody TaskAddDto taskAddDto) {
         Integer taskId = taskService.add(taskAddDto);
-        return taskId != null ? Response.success("添加成功") : Response.error("添加失败");
+        return taskId > 0 ? Response.success("添加成功") : Response.error("添加失败");
     }
 
     @ApiOperation("删除任务")

@@ -4,4 +4,112 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lab.mapper.TaskMapper">
 
+    <insert id="add">
+        INSERT INTO `task` (`task_name`,
+                            `task_assigned_user_id`,
+                            `task_type_id`,
+                            `task_tag_id`,
+                            `create_user_id`,
+                            `update_user_id`,
+                            begin_time,
+                            `end_time`)
+        VALUES (#{dto.taskName},
+                #{dto.taskAssignedUserId},
+                #{dto.taskTypeId},
+                #{dto.taskTagId},
+                #{dto.createUserId},
+                #{dto.updateUserId},
+                #{dto.beginTime},
+                #{dto.endTime});
+    </insert>
+    <delete id="delete">
+        UPDATE task
+        SET is_delete = 1
+        <where>
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+    <update id="update" parameterType="com.lab.dto.TaskUpdateDto">
+        UPDATE task
+        <set>
+            <if test="dto.taskName != null and dto.taskName != ''">
+                task_name = #{dto.taskName},
+            </if>
+            <if test="dto.taskAssignedUserId != null and dto.taskAssignedUserId != ''">
+                task_assigned_user_id = #{dto.taskAssignedUserId},
+            </if>
+            <if test="dto.taskTypeId != null and dto.taskTypeId != ''">
+                task_type_id = #{dto.taskTypeId},
+            </if>
+            <if test="dto.taskTagId != null and dto.taskTagId != ''">
+                task_tag_id = #{dto.taskTagId},
+            </if>
+            <if test="dto.updateUserId != null and dto.updateUserId != ''">
+                update_user_id = #{dto.updateUserId},
+            </if>
+            <if test="dto.endTime != null and dto.endTime != ''">
+                end_time = #{dto.endTime},
+            </if>
+        </set>
+        WHERE id = #{dto.id} and is_delete = 0
+    </update>
+    <select id="getById" resultType="com.lab.vo.TaskSingleVo">
+        SELECT t.task_name             AS taskName,
+               t.task_assigned_user_id AS taskAssignedUserId,
+               t.task_type_id          AS taskTypeId,
+               tp.task_type_name       AS taskTypeName,
+               t.task_tag_id           AS taskTagId,
+               tg.task_tag_name        AS taskTagName,
+               t.create_user_id        AS createUserId,
+               t.update_user_id        AS updateUserId,
+               t.begin_time            AS beginTime,
+               t.update_time           AS updateTime,
+               t.end_time              AS endTime
+        FROM task t
+                 LEFT JOIN task_tag tg ON t.task_tag_id = tg.id
+                 LEFT JOIN task_type tp ON t.task_type_id = tp.id
+                 LEFT JOIN user u ON t.create_user_id = u.id
+        WHERE t.id = #{id}
+          and t.is_delete = 0
+    </select>
+    <select id="list" resultType="com.lab.vo.TaskListVo">
+        SELECT t.task_name AS taskName,
+        t.task_assigned_user_id,
+        tp.task_type_name AS taskTypeName,
+        tg.task_tag_name AS taskTagName,
+        t.create_user_id AS createUserId,
+        t.begin_time  AS beginTime,
+        t.end_time AS endTime
+
+        FROM task t
+        LEFT JOIN task_tag tg ON t.task_tag_id = tg.id
+        LEFT JOIN task_type tp ON t.task_type_id = tp.id
+
+        <where>
+            t.is_delete = 0
+            <if test="dto.taskName != null and dto.taskName != ''">
+                and t.task_name like concat('%',#{dto.taskName},'%')
+            </if>
+            <if test="dto.taskTypeId != null and dto.taskTypeId != ''">
+                and t.task_type_id = #{dto.taskTypeId}
+            </if>
+            <if test="dto.taskTagId != null and dto.taskTagId != ''">
+                and t.task_tag_id = #{dto.taskTagId}
+            </if>
+            <if test="dto.createUserId != null and dto.createUserId != ''">
+                and t.create_user_id = #{dto.createUserId}
+            </if>
+            <if test="dto.beginTime != null and dto.beginTime != ''">
+                and t.begin_time >= #{dto.beginTime}
+            </if>
+            <if test="dto.endTime != null and dto.endTime != ''">
+                and t.end_time &lt; #{dto.endTime}
+            </if>
+        </where>
+    </select>
+
+
 </mapper>

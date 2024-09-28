@@ -78,4 +78,11 @@
         </where>
     </delete>
 
+    <select id="getNameById" resultType="java.lang.String">
+        select name
+        from user
+        where id = #{id}
+    </select>
+
+
 </mapper>
