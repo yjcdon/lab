@@ -1,5 +1,6 @@
 package com.lab.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.lab.constant.MqConstant;
 import com.lab.dto.*;
 import com.lab.mapper.NotifyMapper;
@@ -7,6 +8,7 @@ import com.lab.mapper.TaskMapper;
 import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
 import com.lab.service.NotifyService;
+import com.lab.utils.PageUtil;
 import com.lab.vo.NotifyListVo;
 import com.lab.vo.NotifySingleVo;
 import org.apache.ibatis.session.ExecutorType;
@@ -220,17 +222,20 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public Page<NotifyListVo> list (NotifyListDto notifyListDto) {
-        return null;
+        PageHelper.startPage(notifyListDto.getPageNum(), notifyListDto.getPageSize());
+        List<NotifyListVo> list = notifyMapper.list(notifyListDto);
+        return PageUtil.toPage(list);
     }
 
     @Override
-    public NotifySingleVo getById (NotifySingleDto notifySingleDto) {
-        return null;
+    public NotifySingleVo getById (Integer id) {
+        return notifyMapper.getById(id);
     }
 
     @Override
     public Integer delete (List<Integer> ids) {
-        return 0;
+        Integer count = notifyMapper.delete(ids);
+        return count;
     }
 
     @Override

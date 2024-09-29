@@ -1,9 +1,6 @@
 package com.lab.controller;
 
-import com.lab.dto.NotifyEmailDto;
 import com.lab.dto.NotifyListDto;
-import com.lab.dto.NotifySendDto;
-import com.lab.dto.NotifySingleDto;
 import com.lab.response.Page;
 import com.lab.response.Response;
 import com.lab.service.NotifyService;
@@ -25,8 +22,8 @@ public class NotifyController {
 
     @ApiOperation("查询单个通知")
     @PostMapping("/getOne/{id}")
-    public Response<NotifySingleVo> getById (@RequestBody NotifySingleDto notifySingleDto) {
-        return Response.success(notifyService.getById(notifySingleDto));
+    public Response<NotifySingleVo> getById (@PathVariable Integer id) {
+        return Response.success(notifyService.getById(id));
     }
 
     @ApiOperation("分页查询通知")

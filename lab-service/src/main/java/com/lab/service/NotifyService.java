@@ -3,7 +3,6 @@ package com.lab.service;
 import com.lab.dto.NotifyEmailDto;
 import com.lab.dto.NotifyListDto;
 import com.lab.dto.NotifySendDto;
-import com.lab.dto.NotifySingleDto;
 import com.lab.response.Page;
 import com.lab.vo.NotifyListVo;
 import com.lab.vo.NotifySingleVo;
@@ -15,7 +14,7 @@ public interface NotifyService {
 
     Page<NotifyListVo> list (NotifyListDto notifyListDto);
 
-    NotifySingleVo getById (NotifySingleDto notifySingleDto);
+    NotifySingleVo getById (Integer id);
 
     Integer delete (List<Integer> ids);
 
