@@ -33,12 +33,19 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
             "/task/notify",
     };
 
+    // 拦截的路径
+    private static final String[] INTERCEPT_PATH = {
+            "/user/**",
+            "/task/**",
+            "/notify/**"
+    };
+
 
     @Override
     public void addInterceptors (InterceptorRegistry registry) {
         // 登录拦截器
         registry.addInterceptor(loginInterceptor) // 注册自定义拦截器
-                .addPathPatterns("/user/**", "/task/**") // 拦截的路径
+                .addPathPatterns(INTERCEPT_PATH) // 拦截的路径
                 .excludePathPatterns(LOGIN_PATH); // 排除的路径
 
         // 权限控制拦截器

@@ -9,6 +9,7 @@ import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
 import com.lab.service.NotifyService;
 import com.lab.utils.PageUtil;
+import com.lab.utils.UserUtil;
 import com.lab.vo.NotifyListVo;
 import com.lab.vo.NotifySingleVo;
 import org.apache.ibatis.session.ExecutorType;
@@ -241,5 +242,10 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public String sendEmail (NotifyEmailDto notifyEmailDto) {
         return "";
+    }
+
+    @Override
+    public Integer getIsNotLookCount () {
+        return notifyMapper.getIsNotLookCount(UserUtil.get().getUserId());
     }
 }

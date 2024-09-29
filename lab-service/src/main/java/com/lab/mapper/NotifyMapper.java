@@ -21,4 +21,6 @@ public interface NotifyMapper {
     List<NotifyListVo> list (@Param("dto") NotifyListDto notifyListDto);
 
     Integer delete (@Param("ids") List<Integer> ids);
+
+    Integer getIsNotLookCount (@Param("id") Integer userId);
 }
