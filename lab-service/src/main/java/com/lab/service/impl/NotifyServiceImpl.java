@@ -18,12 +18,11 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NotifyServiceImpl implements NotifyService {
@@ -41,19 +40,20 @@ public class NotifyServiceImpl implements NotifyService {
      * 监听增删改任务发送的消息，并插入notify表
      * */
     @Override
-    public String add (NotifySendDto notifySendDto) {
+    public void add (NotifySendDto notifySendDto) {
         Integer notifyType = notifySendDto.getNotifyType();
 
         // 通知类型是新增任务
         if (notifyType == 1) {
             notifyTypeIsAdd(notifySendDto);
+            // 通知类型是删除任务
         } else if (notifyType == 2) {
             notifyTypeIsDelete(notifySendDto);
+            // 通知类型是更新任务
         } else if (notifyType == 3) {
-
+            notifyTypeIsUpdate(notifySendDto);
         }
 
-        return "";
     }
 
     /*
@@ -149,7 +149,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             // 循环插入
             for (int i = 0; i < userNames.size(); i++) {
-                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师发布了新任务：" + taskName + "，请尽快处理。");
+                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师发布了新任务：" + taskName);
                 notifyAddDto.setUserId(userIds.get(i));
                 mapper.insertForTypeAdd(notifyAddDto);
             }
@@ -163,12 +163,59 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
-    private List<String> getUsernameList (String[] assignedUserIds) {
-        List<Integer> userIds = new ArrayList<>(assignedUserIds.length);
-        for (String s : assignedUserIds) {
-            userIds.add(Integer.parseInt(s));
+    /*
+     * 更新任务的情况的通知
+     * */
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
+            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
+            key = {MqConstant.ROUTING_KEY_UPDATE}
+    ))
+    private void notifyTypeIsUpdate (NotifySendDto notifySendDto) {
+        // 获取修改前的分配用户ID集合
+        Set<Integer> beforeIds = Arrays.stream(notifySendDto.getBeforeAssignedUserId().split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+
+        // 获取当前分配用户ID集合
+        Set<Integer> currentIds = Arrays.stream(notifySendDto.getTaskAssignedUserId().split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+
+        // 合并两个集合,得到所有分配用户ID集合
+        Set<Integer> allIds = new HashSet<>(beforeIds);
+        allIds.addAll(currentIds);
+
+        // 获取用户名称列表
+        List<Integer> userIds = new ArrayList<>(allIds);
+        List<String> userNames = userMapper.getNamesByIds(userIds);
+
+
+        // 构造NotifyAddDto
+        NotifyAddDto notifyAddDto = new NotifyAddDto();
+        notifyAddDto.setNotifyType(notifySendDto.getNotifyType());
+
+        // 因为是更新任务，任务名只会有一个
+        String taskName = taskMapper.getTaskNamesByIds(notifySendDto.getId()).get(0);
+
+        // 插入到数据库
+        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
+        NotifyMapper mapper = sqlSession.getMapper(NotifyMapper.class);
+        try {
+            // 循环插入
+            for (int i = 0; i < userNames.size(); i++) {
+                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师修改了任务：" + taskName);
+                notifyAddDto.setUserId(userIds.get(i));
+                mapper.insertForTypeAdd(notifyAddDto);
+            }
+
+            sqlSession.commit();
+        } catch (Exception e) {
+            System.out.println("发生异常，事务回滚");
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
         }
-        return userMapper.getNamesByIds(userIds);
     }
 
     @Override

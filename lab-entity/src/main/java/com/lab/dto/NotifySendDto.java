@@ -38,4 +38,7 @@ public class NotifySendDto implements Serializable {
 
     @ApiModelProperty("通知类型，1新增任务，2删除任务，3修改任务")
     private Integer notifyType;
+
+    @ApiModelProperty("修改前已分配的用户ID，仅用于修改通知")
+    private String beforeAssignedUserId;
 }

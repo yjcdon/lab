@@ -79,7 +79,27 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean update (TaskUpdateDto taskUpdateDto) {
-        return taskMapper.update(taskUpdateDto);
+        // 修改任务可能会增减用户，所以这里提前查出来原来分配的ID
+        String beforeIds = taskMapper.getTaskAssignedUserIds(Collections.singletonList(taskUpdateDto.getId())).get(0);
+
+        boolean isSuccess = taskMapper.update(taskUpdateDto);
+        if (isSuccess) {
+            sendNotifyForUpdate(taskUpdateDto, beforeIds);
+        }
+
+        return isSuccess;
+    }
+
+    @Async
+    protected void sendNotifyForUpdate (TaskUpdateDto taskUpdateDto, String beforeIds) {
+        NotifySendDto dto = new NotifySendDto();
+        // 设置任务主键ID
+        dto.setId(Collections.singletonList(taskUpdateDto.getId()));
+        dto.setNotifyType(3);
+        dto.setTaskAssignedUserId(taskUpdateDto.getTaskAssignedUserId());
+        dto.setBeforeAssignedUserId(beforeIds);
+
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_UPDATE, dto);
     }
 
     @Override

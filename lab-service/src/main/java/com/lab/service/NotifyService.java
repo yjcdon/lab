@@ -11,7 +11,7 @@ import com.lab.vo.NotifySingleVo;
 import java.util.List;
 
 public interface NotifyService {
-    String add (NotifySendDto notifySendDto);
+    void add (NotifySendDto notifySendDto);
 
     Page<NotifyListVo> list (NotifyListDto notifyListDto);
 
