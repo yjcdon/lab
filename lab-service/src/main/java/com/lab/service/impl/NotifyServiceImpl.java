@@ -21,7 +21,6 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -43,6 +42,11 @@ public class NotifyServiceImpl implements NotifyService {
      * 监听增删改任务发送的消息，并插入notify表
      * */
     @Override
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
+            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
+            key = {MqConstant.ROUTING_KEY_NOTIFY_ALL}
+    ))
     public void add (NotifySendDto notifySendDto) {
         Integer notifyType = notifySendDto.getNotifyType();
 
@@ -62,11 +66,6 @@ public class NotifyServiceImpl implements NotifyService {
     /*
      * 删除任务的情况的通知
      * */
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
-            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
-            key = {MqConstant.ROUTING_KEY_DELETE}
-    ))
     private void notifyTypeIsDelete (NotifySendDto notifySendDto) {
         // 通过消息中的任务主键ID，得到assignedUserIds
         List<Integer> taskIds = notifySendDto.getId();
@@ -125,11 +124,6 @@ public class NotifyServiceImpl implements NotifyService {
     /*
      * 新增任务的情况的通知
      * */
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
-            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
-            key = {MqConstant.ROUTING_KEY_ADD}
-    ))
     private void notifyTypeIsAdd (NotifySendDto notifySendDto) {
         // 转换ID类型
         String[] assignedUserIds = notifySendDto.getTaskAssignedUserId().split(",");
@@ -169,11 +163,6 @@ public class NotifyServiceImpl implements NotifyService {
     /*
      * 更新任务的情况的通知
      * */
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
-            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
-            key = {MqConstant.ROUTING_KEY_UPDATE}
-    ))
     private void notifyTypeIsUpdate (NotifySendDto notifySendDto) {
         // 获取修改前的分配用户ID集合
         Set<Integer> beforeIds = Arrays.stream(notifySendDto.getBeforeAssignedUserId().split(","))
@@ -235,8 +224,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public Integer delete (List<Integer> ids) {
-        Integer count = notifyMapper.delete(ids);
-        return count;
+        return notifyMapper.delete(ids);
     }
 
     @Override

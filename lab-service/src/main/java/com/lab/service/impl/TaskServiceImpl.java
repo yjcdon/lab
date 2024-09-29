@@ -54,7 +54,7 @@ public class TaskServiceImpl implements TaskService {
 
         BeanUtil.copyProperties(taskAddDto, dto, "id");
 
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_ADD, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_ADD, dto);
     }
 
     @Override
@@ -63,18 +63,18 @@ public class TaskServiceImpl implements TaskService {
 
         // 删除成功，发送消息
         if (count != null && count > 0) {
-            sendNotifyForDelete(ids, count);
+            sendNotifyForDelete(ids);
         }
         return count;
     }
 
     @Async
-    protected void sendNotifyForDelete (List<Integer> ids, Integer count) {
+    protected void sendNotifyForDelete (List<Integer> ids) {
         NotifySendDto dto = new NotifySendDto();
         // 在监听函数中，需要根据任务主键ID查询已分配用户ID
         dto.setId(ids);
         dto.setNotifyType(2);
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_DELETE, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_DELETE, dto);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class TaskServiceImpl implements TaskService {
         dto.setTaskAssignedUserId(taskUpdateDto.getTaskAssignedUserId());
         dto.setBeforeAssignedUserId(beforeIds);
 
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_UPDATE, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_UPDATE, dto);
     }
 
     @Override
