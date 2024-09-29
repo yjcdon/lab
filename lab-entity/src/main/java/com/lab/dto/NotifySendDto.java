@@ -27,9 +27,6 @@ public class NotifySendDto implements Serializable {
     @ApiModelProperty("任务标签id")
     private Integer taskTagId;
 
-    @ApiModelProperty("当前用户ID")
-    private Integer currentUserId;
-    
     @ApiModelProperty("更新用户id")
     private Integer updateUserId;
 

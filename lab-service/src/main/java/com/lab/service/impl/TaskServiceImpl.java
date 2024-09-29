@@ -40,17 +40,16 @@ public class TaskServiceImpl implements TaskService {
 
         // 如果插入成功，则异步发送通知
         if (count != null && count > 0) {
-            sendNotify(taskAddDto);
+            sendNotifyForAdd(taskAddDto);
         }
 
         return count;
     }
 
     @Async
-    protected void sendNotify (TaskAddDto taskAddDto) {
+    protected void sendNotifyForAdd (TaskAddDto taskAddDto) {
         NotifySendDto dto = new NotifySendDto();
-        dto.setCurrentUserId(UserUtil.get().getUserId());
-        dto.setId(Collections.singletonList(taskAddDto.getTaskId()));
+        dto.setId(Collections.singletonList(taskAddDto.getId()));
         dto.setNotifyType(1);
 
         BeanUtil.copyProperties(taskAddDto, dto, "id");
@@ -61,11 +60,21 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Integer delete (List<Integer> ids) {
         Integer count = taskMapper.delete(ids);
+
+        // 删除成功，发送消息
         if (count != null && count > 0) {
-            NotifySendDto dto = new NotifySendDto();
-            dto.setCurrentUserId(UserUtil.get().getUserId());
+            sendNotifyForDelete(ids, count);
         }
         return count;
+    }
+
+    @Async
+    protected void sendNotifyForDelete (List<Integer> ids, Integer count) {
+        NotifySendDto dto = new NotifySendDto();
+        // 在监听函数中，需要根据任务主键ID查询已分配用户ID
+        dto.setId(ids);
+        dto.setNotifyType(2);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_DELETE, dto);
     }
 
     @Override

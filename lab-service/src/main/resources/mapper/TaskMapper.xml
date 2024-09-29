@@ -110,7 +110,7 @@
             </if>
         </where>
     </select>
-    <select id="getNamesByIds" resultType="java.lang.String">
+    <select id="getTaskNamesByIds" resultType="java.lang.String">
         select task_name
         from task
         <where>
@@ -119,6 +119,14 @@
                 #{id}
             </foreach>
         </where>
+    </select>
+    <select id="getTaskAssignedUserIds" resultType="java.lang.String">
+        SELECT task_assigned_user_id
+        FROM task
+        WHERE id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </select>
 
 

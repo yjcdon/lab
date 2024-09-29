@@ -25,5 +25,7 @@ public interface TaskMapper {
 
     List<TaskListVo> list (@Param("dto") TaskListDto taskListDto);
 
-    List<String> getNamesByIds (@Param("ids") List<Integer> taskIds);
+    List<String> getTaskNamesByIds (@Param("ids") List<Integer> taskIds);
+
+    List<String> getTaskAssignedUserIds (@Param("ids") List<Integer> taskIds);
 }

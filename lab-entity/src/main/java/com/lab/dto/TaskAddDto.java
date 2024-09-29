@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class TaskAddDto {
     @ApiModelProperty("任务主键id，前端不用指定")
-    private Integer taskId;
+    private Integer id;
 
     @ApiModelProperty("任务名字")
     private String taskName;
