@@ -15,6 +15,7 @@ import com.lab.utils.UserUtil;
 import com.lab.vo.TaskListVo;
 import com.lab.vo.TaskSingleVo;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -39,23 +40,28 @@ public class TaskServiceImpl implements TaskService {
 
         // 如果插入成功，则异步发送通知
         if (count != null && count > 0) {
-            NotifySendDto dto = new NotifySendDto();
-            dto.setCurrentUserId(UserUtil.get().getUserId());
-            dto.setId(Collections.singletonList(taskAddDto.getId()));
-            dto.setNotifyType(1);
-
-            BeanUtil.copyProperties(taskAddDto, dto, "id");
-
-            rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_ADD, dto);
+            sendNotify(taskAddDto);
         }
 
         return count;
     }
 
+    @Async
+    protected void sendNotify (TaskAddDto taskAddDto) {
+        NotifySendDto dto = new NotifySendDto();
+        dto.setCurrentUserId(UserUtil.get().getUserId());
+        dto.setId(Collections.singletonList(taskAddDto.getTaskId()));
+        dto.setNotifyType(1);
+
+        BeanUtil.copyProperties(taskAddDto, dto, "id");
+
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_ADD, dto);
+    }
+
     @Override
     public Integer delete (List<Integer> ids) {
         Integer count = taskMapper.delete(ids);
-        if (count != null) {
+        if (count != null && count > 0) {
             NotifySendDto dto = new NotifySendDto();
             dto.setCurrentUserId(UserUtil.get().getUserId());
         }

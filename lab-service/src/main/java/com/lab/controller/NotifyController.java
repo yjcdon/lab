@@ -23,12 +23,6 @@ public class NotifyController {
     @Resource
     private NotifyService notifyService;
 
-    @ApiOperation("插入通知数据")
-    @PostMapping("/add")
-    public Response<String> add (@RequestBody NotifySendDto notifySendDto) {
-        return Response.success(notifyService.add(notifySendDto));
-    }
-
     @ApiOperation("查询单个通知")
     @PostMapping("/getOne/{id}")
     public Response<NotifySingleVo> getById (@RequestBody NotifySingleDto notifySingleDto) {
@@ -46,12 +40,6 @@ public class NotifyController {
     public Response<String> delete (@RequestParam("ids") List<Integer> ids) {
         Integer count = notifyService.delete(ids);
         return count != null ? Response.success("删除成功") : Response.error("删除失败");
-    }
-
-    @ApiOperation("邮件通知")
-    @PostMapping("/sendEmail")
-    public Response<String> sendEmail(@RequestBody NotifyEmailDto notifyEmailDto){
-        return Response.success(notifyService.sendEmail(notifyEmailDto));
     }
 
 
