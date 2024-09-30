@@ -174,13 +174,32 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(Integer::parseInt)
                 .collect(Collectors.toSet());
 
-        // 合并两个集合,得到所有分配用户ID集合
-        Set<Integer> allIds = new HashSet<>(beforeIds);
-        allIds.addAll(currentIds);
 
-        // 获取用户名称列表
-        List<Integer> userIds = new ArrayList<>(allIds);
-        List<String> userNames = userMapper.getNamesByIds(userIds);
+        // 求修改前和修改后的id区别——发送删除的通知
+        List<Integer> idsForDelete = beforeIds.stream()
+                .filter(i -> !currentIds.contains(i))
+                .collect(Collectors.toList());
+
+        // 求 修改后比修改前 新增加了的ID——发送新增的通知
+        List<Integer> idsForAdd = currentIds.stream()
+                .filter(i -> !beforeIds.contains(i))
+                .collect(Collectors.toList());
+
+        // 求修改前和修改后的交集——发送修改的通知
+        Set<Integer> intersectionSet = new HashSet<>(beforeIds);
+        intersectionSet.retainAll(currentIds);
+        List<Integer> idsForUpdate = new ArrayList<>(intersectionSet);
+
+
+        /*
+         * 获取需要发送不同类型通知的用户名
+         * */
+        // 删除类型通知的用户名
+        List<String> namesForDelete = userMapper.getNamesByIds(idsForDelete);
+        // 新增类型通知的用户名
+        List<String> namesForAdd = userMapper.getNamesByIds(idsForAdd);
+        // 更新类型通知的用户名
+        List<String> namesForUpdate = userMapper.getNamesByIds(idsForUpdate);
 
 
         // 构造NotifyAddDto
@@ -195,12 +214,24 @@ public class NotifyServiceImpl implements NotifyService {
         NotifyMapper mapper = sqlSession.getMapper(NotifyMapper.class);
         try {
             // 循环插入
-            for (int i = 0; i < userNames.size(); i++) {
-                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师修改了任务：" + taskName);
-                notifyAddDto.setUserId(userIds.get(i));
+            for (int i = 0; i < namesForDelete.size(); i++) {
+                notifyAddDto.setContent(namesForDelete.get(i) + " 你好，你的导师将你移除出了任务：" + taskName);
+                notifyAddDto.setUserId(idsForDelete.get(i));
                 mapper.insertForTypeAdd(notifyAddDto);
             }
 
+            for (int i = 0; i < namesForAdd.size(); i++) {
+                notifyAddDto.setContent(namesForDelete.get(i) + " 你好，你的导师将你添加到了任务：" + taskName);
+                notifyAddDto.setUserId(idsForAdd.get(i));
+                mapper.insertForTypeAdd(notifyAddDto);
+            }
+
+            for (int i = 0; i < namesForUpdate.size(); i++) {
+                notifyAddDto.setContent(namesForDelete.get(i) + " 你好，你的导师修改了任务：" + taskName);
+                notifyAddDto.setUserId(idsForUpdate.get(i));
+                mapper.insertForTypeAdd(notifyAddDto);
+            }
+            // 4 5 6-》1 2 6
             sqlSession.commit();
         } catch (Exception e) {
             System.out.println("发生异常，事务回滚");
