@@ -21,3 +21,8 @@ lab:
     virtualHost: /lab
     username: lab
     password: lab
+  mail:
+    # 配置邮件发送者用户名或者账户
+    username: liangyujia1203@qq.com
+    # 配置邮件发送者密码或者授权码
+    password: oyysnftrdsrmhfdj

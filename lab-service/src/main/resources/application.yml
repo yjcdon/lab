@@ -23,6 +23,27 @@ spring:
     username: ${lab.mq.username}
     password: ${lab.mq.password}
 
+  mail:
+    host: smtp.qq.com
+    # 配置邮件发送服务端口号
+    port: 465
+    # 配置邮件发送服务协议
+    protocol: smtp
+    # 配置邮件发送者用户名或者账户
+    username: ${lab.mail.username}
+    # 配置邮件发送者密码或者授权码
+    password: ${lab.mail.password}
+    # 配置邮件默认编码
+    default-encoding: UTF-8
+    # 配置smtp相关属性
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            required: true
+
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
