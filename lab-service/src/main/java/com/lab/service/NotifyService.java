@@ -18,7 +18,7 @@ public interface NotifyService {
 
     Integer delete (List<Integer> ids);
 
-    String sendEmail (NotifyEmailDto notifyEmailDto);
+    void sendEmail (NotifyEmailDto notifyEmailDto);
 
     Integer getIsNotLookCount ();
 }

@@ -2,13 +2,11 @@ package com.lab.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.lab.constant.MqConstant;
-import com.lab.dto.NotifySendDto;
-import com.lab.dto.TaskAddDto;
-import com.lab.dto.TaskListDto;
-import com.lab.dto.TaskUpdateDto;
+import com.lab.dto.*;
 import com.lab.mapper.TaskMapper;
 import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
+import com.lab.service.MailService;
 import com.lab.service.TaskService;
 import com.lab.utils.PageUtil;
 import com.lab.utils.UserUtil;
@@ -41,6 +39,7 @@ public class TaskServiceImpl implements TaskService {
         // 如果插入成功，则异步发送通知
         if (count != null && count > 0) {
             sendNotifyForAdd(taskAddDto);
+            sendEmailForAdd(taskAddDto);
         }
 
         return count;
@@ -49,12 +48,23 @@ public class TaskServiceImpl implements TaskService {
     @Async
     protected void sendNotifyForAdd (TaskAddDto taskAddDto) {
         NotifySendDto dto = new NotifySendDto();
-        dto.setId(Collections.singletonList(taskAddDto.getId()));
+        dto.setTaskName(taskAddDto.getTaskName());
         dto.setNotifyType(1);
 
         BeanUtil.copyProperties(taskAddDto, dto, "id");
 
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_ADD, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_NOTIFY, MqConstant.ROUTING_KEY_NOTIFY_ADD, dto);
+    }
+
+    @Async
+    protected void sendEmailForAdd (TaskAddDto taskAddDto) {
+        NotifyEmailDto dto = new NotifyEmailDto();
+        dto.setTaskName(Collections.singletonList(taskAddDto.getTaskName()));
+        // 为了查出用户名和email
+        dto.setTaskAssignedUserId(taskAddDto.getTaskAssignedUserId());
+        dto.setEmailType(1);
+
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_EMAIL, MqConstant.ROUTING_KEY_EMAIL_ADD, dto);
     }
 
     @Override
@@ -74,7 +84,7 @@ public class TaskServiceImpl implements TaskService {
         // 在监听函数中，需要根据任务主键ID查询已分配用户ID
         dto.setId(ids);
         dto.setNotifyType(2);
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_DELETE, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_NOTIFY, MqConstant.ROUTING_KEY_NOTIFY_DELETE, dto);
     }
 
     @Override
@@ -99,7 +109,7 @@ public class TaskServiceImpl implements TaskService {
         dto.setTaskAssignedUserId(taskUpdateDto.getTaskAssignedUserId());
         dto.setBeforeAssignedUserId(beforeIds);
 
-        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_LAB, MqConstant.ROUTING_KEY_NOTIFY_UPDATE, dto);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_NOTIFY, MqConstant.ROUTING_KEY_NOTIFY_UPDATE, dto);
     }
 
     @Override

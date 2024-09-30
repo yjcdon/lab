@@ -7,6 +7,7 @@ import com.lab.mapper.NotifyMapper;
 import com.lab.mapper.TaskMapper;
 import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
+import com.lab.service.MailService;
 import com.lab.service.NotifyService;
 import com.lab.utils.PageUtil;
 import com.lab.utils.UserUtil;
@@ -34,6 +35,8 @@ public class NotifyServiceImpl implements NotifyService {
     private UserMapper userMapper;
     @Resource
     private TaskMapper taskMapper;
+    @Resource
+    private MailService mailService;
 
     @Resource
     private SqlSessionFactory sqlSessionFactory;
@@ -43,8 +46,8 @@ public class NotifyServiceImpl implements NotifyService {
      * */
     @Override
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = MqConstant.QUEUE_LAB, durable = "true"),
-            exchange = @Exchange(name = MqConstant.EXCHANGE_LAB, type = ExchangeTypes.TOPIC),
+            value = @Queue(name = MqConstant.QUEUE_NOTIFY, durable = "true"),
+            exchange = @Exchange(name = MqConstant.EXCHANGE_NOTIFY, type = ExchangeTypes.TOPIC),
             key = {MqConstant.ROUTING_KEY_NOTIFY_ALL}
     ))
     public void add (NotifySendDto notifySendDto) {
@@ -138,7 +141,7 @@ public class NotifyServiceImpl implements NotifyService {
         notifyAddDto.setNotifyType(notifySendDto.getNotifyType());
 
         // 因为新增任务，任务名只会有一个
-        String taskName = taskMapper.getTaskNamesByIds(notifySendDto.getId()).get(0);
+        String taskName = notifySendDto.getTaskName();
 
         // 插入到数据库
         SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
@@ -241,6 +244,51 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
+    /*
+     * 监听发送邮件的消息
+     * */
+    @Override
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = MqConstant.QUEUE_EMAIL, durable = "true"),
+            exchange = @Exchange(name = MqConstant.EXCHANGE_EMAIL, type = ExchangeTypes.TOPIC),
+            key = {MqConstant.ROUTING_KEY_EMAIL_ALL}
+    ))
+    public void sendEmail (NotifyEmailDto notifyEmailDto) {
+        Integer emailType = notifyEmailDto.getEmailType();
+
+        if (emailType == 1) {
+            // 新增类型的邮件
+            sendEmailForAdd(notifyEmailDto);
+        } else if (emailType == 2) {
+            // 删除类型的邮件
+            sendEmailForDelete(notifyEmailDto);
+        } else if (emailType == 3) {
+            // 更新类型的邮件
+            sendEmailForUpdate(notifyEmailDto);
+        }
+    }
+
+    /*
+    * 发送新增类型的邮件
+    * */
+    private void sendEmailForAdd (NotifyEmailDto notifyEmailDto) {
+
+    }
+
+    /*
+    * 发送删除类型的邮件
+    * */
+    private void sendEmailForDelete (NotifyEmailDto notifyEmailDto) {
+
+    }
+
+    /*
+    * 发送修改类型的邮件
+    * */
+    private void sendEmailForUpdate (NotifyEmailDto notifyEmailDto) {
+
+    }
+
     @Override
     public Page<NotifyListVo> list (NotifyListDto notifyListDto) {
         PageHelper.startPage(notifyListDto.getPageNum(), notifyListDto.getPageSize());
@@ -256,11 +304,6 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public Integer delete (List<Integer> ids) {
         return notifyMapper.delete(ids);
-    }
-
-    @Override
-    public String sendEmail (NotifyEmailDto notifyEmailDto) {
-        return "";
     }
 
     @Override
