@@ -1,11 +1,13 @@
 package com.lab.mapper;
 
 import com.lab.dto.*;
+import com.lab.service.impl.NotifyServiceImpl;
 import com.lab.vo.UserListVo;
 import com.lab.vo.UserSingleVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Author: 梁雨佳
@@ -30,4 +32,8 @@ public interface UserMapper {
     String getNameById (@Param("id") Integer id);
 
     List<String> getNamesByIds (@Param("ids") List<Integer> ids);
+
+    Set<String> getEmailsByIds (@Param("ids") List<Integer> userIds);
+
+    List<NameAndEmailDto> getNameAndEmailsByIds (@Param("ids") List<Integer> userIds);
 }

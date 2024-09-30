@@ -13,6 +13,16 @@ public interface MailService {
      */
     void sendSimpleMail (String from, String[] to, String subject, String content);
 
+     /**
+     * 发送只包含文本内容的邮件，不同的收件人内容也不同
+     *
+     * @param from    发送者的邮箱地址
+     * @param to      接收者的邮箱地址数组
+     * @param subject 邮件主题
+     * @param contents 邮件内容
+     */
+    void sendSimpleMail (String from, String[] to, String subject, List<String> contents);
+
     /**
      * 发送 HTML 格式的邮件
      *

@@ -25,6 +25,7 @@ public class MailServiceImpl implements MailService {
      * 发送只包含文本内容的邮件
      * 指定发送者的邮箱地址，接收者的邮箱地址，主题和内容
      * */
+    @Override
     public void sendSimpleMail (String from, String[] to, String subject, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
@@ -35,8 +36,25 @@ public class MailServiceImpl implements MailService {
     }
 
     /*
+     * 发送只包含文本内容的邮件，对不同的收件人内容也不同
+     * 指定发送者的邮箱地址，接收者的邮箱地址，主题和内容
+     * */
+    @Override
+    public void sendSimpleMail (String from, String[] to, String subject, List<String> contents) {
+        for (int i = 0; i < to.length; i++) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(from);
+            message.setTo(to[i]);
+            message.setSubject(subject);
+            message.setText(contents.get(i));
+            mailSender.send(message);
+        }
+    }
+
+    /*
      * 发送HTML格式的邮件
      * */
+    @Override
     public void sendHtmlMail (String from, String[] to, String subject, String content) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -55,6 +73,7 @@ public class MailServiceImpl implements MailService {
      * 发送带附件的、HTML 格式的邮件
      * 需要额外指定 文件的绝对路径/url 和 文件名.后缀
      * */
+    @Override
     public void sendHtmlMailWithFile (String from, String[] to, String subject, String content, String filePath, String fileName) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -78,6 +97,7 @@ public class MailServiceImpl implements MailService {
     /*
      * 发送带多个附件的、HTML 格式的邮件
      * */
+    @Override
     public void sendHtmlMailWithFiles (String from, String[] to, String subject, String content, List<String> filePaths, List<String> fileNames) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();

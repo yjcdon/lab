@@ -93,6 +93,24 @@
             </foreach>
         </where>
     </select>
+    <select id="getEmailsByIds" resultType="java.lang.String">
+        select email
+        from user
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="getNameAndEmailsByIds" resultType="com.lab.dto.NameAndEmailDto">
+        select name,email
+        from user
+        <where>
+            id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
 
 
 </mapper>

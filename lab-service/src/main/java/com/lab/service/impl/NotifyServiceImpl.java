@@ -1,6 +1,7 @@
 package com.lab.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.lab.constant.MailConstant;
 import com.lab.constant.MqConstant;
 import com.lab.dto.*;
 import com.lab.mapper.NotifyMapper;
@@ -167,6 +168,8 @@ public class NotifyServiceImpl implements NotifyService {
      * 更新任务的情况的通知
      * */
     private void notifyTypeIsUpdate (NotifySendDto notifySendDto) {
+        // todo 如果前后已分配的用户ID没变化，SQL会报错
+
         // 获取修改前的分配用户ID集合
         Set<Integer> beforeIds = Arrays.stream(notifySendDto.getBeforeAssignedUserId().split(","))
                 .map(Integer::parseInt)
@@ -269,22 +272,44 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /*
-    * 发送新增类型的邮件
-    * */
+     * 发送新增类型的邮件
+     * */
     private void sendEmailForAdd (NotifyEmailDto notifyEmailDto) {
+        // 转换ID类型
+        String[] assignedUserIds = notifyEmailDto.getTaskAssignedUserId().split(",");
+        List<Integer> userIds = new ArrayList<>(assignedUserIds.length);
+        for (String s : assignedUserIds) {
+            userIds.add(Integer.parseInt(s));
+        }
 
+        // 得到名字和邮件对应的对象
+        List<NameAndEmailDto> nameAndEmails = userMapper.getNameAndEmailsByIds(userIds);
+        List<String> emails = new ArrayList<>(nameAndEmails.size());
+
+        // 新增任务时，任务名只会有一个
+        String taskName = notifyEmailDto.getTaskName().get(0);
+
+        // 构造content
+        List<String> contents = new ArrayList<>(nameAndEmails.size());
+        for (NameAndEmailDto nameAndEmail : nameAndEmails) {
+            contents.add(nameAndEmail.getName() + " 你好，你的导师发布了新任务：" + taskName);
+            emails.add(nameAndEmail.getEmail());
+        }
+
+        // 发送邮件
+        mailService.sendSimpleMail(MailConstant.FROM, emails.toArray(new String[0]), MailConstant.SUBJECT_ADD, contents);
     }
 
     /*
-    * 发送删除类型的邮件
-    * */
+     * 发送删除类型的邮件
+     * */
     private void sendEmailForDelete (NotifyEmailDto notifyEmailDto) {
 
     }
 
     /*
-    * 发送修改类型的邮件
-    * */
+     * 发送修改类型的邮件
+     * */
     private void sendEmailForUpdate (NotifyEmailDto notifyEmailDto) {
 
     }
