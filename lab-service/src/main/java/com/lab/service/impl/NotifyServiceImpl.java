@@ -311,7 +311,46 @@ public class NotifyServiceImpl implements NotifyService {
      * 发送删除类型的邮件
      * */
     private void sendEmailForDelete (NotifyEmailDto notifyEmailDto) {
+        // 通过消息中的任务主键ID，得到assignedUserIds
+        List<Integer> taskIds = notifyEmailDto.getId();
+        List<String> assignedUserIds = taskMapper.getTaskAssignedUserIds(taskIds);
 
+        // 对assignedUserIds去重
+        Set<Integer> userIdSet = new HashSet<>();
+        for (String assignedUserId : assignedUserIds) {
+            String[] ids = assignedUserId.split(",");
+            for (String userId : ids) {
+                userIdSet.add(Integer.parseInt(userId));
+            }
+        }
+
+        // 转换ID类型，并查出这些ID对应的用户名和邮件
+        List<Integer> userIds = new ArrayList<>(userIdSet);
+        List<NameAndEmailDto> nameAndEmails = userMapper.getNameAndEmailsByIds(userIds);
+
+        // 查出任务名并拼接
+        List<String> taskNames = taskMapper.getTaskNamesByIds(taskIds);
+        String res;
+        if (taskNames.size() > 1) {
+            StringBuilder sb = new StringBuilder();
+            for (String name : taskNames) {
+                sb.append(name).append("，");
+            }
+            res = sb.substring(0, sb.length() - 1);
+        } else {
+            res = taskNames.get(0);
+        }
+
+        // 构造content
+        List<String> contents = new ArrayList<>(taskNames.size());
+        List<String> emails = new ArrayList<>(nameAndEmails.size());
+        for (NameAndEmailDto nameAndEmail : nameAndEmails) {
+            contents.add(nameAndEmail.getName() + " 你好，你的导师删除了 " + taskNames.size() + " 个任务：" + res);
+            emails.add(nameAndEmail.getEmail());
+        }
+
+        // 发送邮件
+        mailService.sendSimpleMail(MailConstant.FROM, emails.toArray(new String[0]), MailConstant.SUBJECT_DELETE, contents);
     }
 
     /*

@@ -74,6 +74,7 @@ public class TaskServiceImpl implements TaskService {
         // 删除成功，发送消息
         if (count != null && count > 0) {
             sendNotifyForDelete(ids);
+            sendEmailForDelete(ids);
         }
         return count;
     }
@@ -85,6 +86,14 @@ public class TaskServiceImpl implements TaskService {
         dto.setId(ids);
         dto.setNotifyType(2);
         rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_NOTIFY, MqConstant.ROUTING_KEY_NOTIFY_DELETE, dto);
+    }
+
+    @Async
+    protected void sendEmailForDelete (List<Integer> ids) {
+        NotifyEmailDto dto = new NotifyEmailDto();
+        dto.setId(ids);
+        dto.setEmailType(2);
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_EMAIL, MqConstant.ROUTING_KEY_EMAIL_DELETE, dto);
     }
 
     @Override
