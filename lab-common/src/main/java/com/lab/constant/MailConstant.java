@@ -7,4 +7,6 @@ public class MailConstant {
 
     public static final String SUBJECT_DELETE = "删除任务";
 
+    public static final String SUBJECT_UPDATE = "更新任务";
+
 }

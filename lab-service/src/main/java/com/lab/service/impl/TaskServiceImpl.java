@@ -104,6 +104,7 @@ public class TaskServiceImpl implements TaskService {
         boolean isSuccess = taskMapper.update(taskUpdateDto);
         if (isSuccess) {
             sendNotifyForUpdate(taskUpdateDto, beforeIds);
+            sendEmailForUpdate(taskUpdateDto, beforeIds);
         }
 
         return isSuccess;
@@ -119,6 +120,19 @@ public class TaskServiceImpl implements TaskService {
         dto.setBeforeAssignedUserId(beforeIds);
 
         rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_NOTIFY, MqConstant.ROUTING_KEY_NOTIFY_UPDATE, dto);
+    }
+
+    @Async
+    protected void sendEmailForUpdate (TaskUpdateDto taskUpdateDto, String beforeIds) {
+        NotifyEmailDto dto = new NotifyEmailDto();
+
+        dto.setId(Collections.singletonList(taskUpdateDto.getId()));
+        dto.setEmailType(3);
+        dto.setTaskAssignedUserId(taskUpdateDto.getTaskAssignedUserId());
+        dto.setBeforeAssignedUserId(beforeIds);
+        dto.setTaskName(Collections.singletonList(taskUpdateDto.getTaskName()));
+
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_EMAIL, MqConstant.ROUTING_KEY_EMAIL_UPDATE, dto);
     }
 
     @Override

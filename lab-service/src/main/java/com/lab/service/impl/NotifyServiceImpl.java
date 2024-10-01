@@ -68,6 +68,46 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /*
+     * 新增任务的情况的通知
+     * */
+    private void notifyTypeIsAdd (NotifySendDto notifySendDto) {
+        // 转换ID类型
+        String[] assignedUserIds = notifySendDto.getTaskAssignedUserId().split(",");
+        List<Integer> userIds = new ArrayList<>(assignedUserIds.length);
+        for (String s : assignedUserIds) {
+            userIds.add(Integer.parseInt(s));
+        }
+        List<String> userNames = userMapper.getNamesByIds(userIds);
+
+        // 构造NotifyAddDto
+        NotifyAddDto notifyAddDto = new NotifyAddDto();
+        notifyAddDto.setNotifyType(notifySendDto.getNotifyType());
+
+        // 因为新增任务，任务名只会有一个
+        String taskName = notifySendDto.getTaskName();
+
+        // 插入到数据库
+        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
+        NotifyMapper mapper = sqlSession.getMapper(NotifyMapper.class);
+        try {
+            // 循环插入
+            for (int i = 0; i < userNames.size(); i++) {
+                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师发布了新任务：" + taskName);
+                notifyAddDto.setUserId(userIds.get(i));
+                mapper.insertForTypeAdd(notifyAddDto);
+            }
+
+            sqlSession.commit();
+        } catch (Exception e) {
+            System.out.println("发生异常，事务回滚");
+            e.printStackTrace();
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    /*
      * 删除任务的情况的通知
      * */
     private void notifyTypeIsDelete (NotifySendDto notifySendDto) {
@@ -112,46 +152,6 @@ public class NotifyServiceImpl implements NotifyService {
             // 循环插入
             for (int i = 0; i < userNames.size(); i++) {
                 notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师删除了 " + taskNames.size() + " 个任务：" + res);
-                notifyAddDto.setUserId(userIds.get(i));
-                mapper.insertForTypeAdd(notifyAddDto);
-            }
-
-            sqlSession.commit();
-        } catch (Exception e) {
-            System.out.println("发生异常，事务回滚");
-            e.printStackTrace();
-            sqlSession.rollback();
-        } finally {
-            sqlSession.close();
-        }
-    }
-
-    /*
-     * 新增任务的情况的通知
-     * */
-    private void notifyTypeIsAdd (NotifySendDto notifySendDto) {
-        // 转换ID类型
-        String[] assignedUserIds = notifySendDto.getTaskAssignedUserId().split(",");
-        List<Integer> userIds = new ArrayList<>(assignedUserIds.length);
-        for (String s : assignedUserIds) {
-            userIds.add(Integer.parseInt(s));
-        }
-        List<String> userNames = userMapper.getNamesByIds(userIds);
-
-        // 构造NotifyAddDto
-        NotifyAddDto notifyAddDto = new NotifyAddDto();
-        notifyAddDto.setNotifyType(notifySendDto.getNotifyType());
-
-        // 因为新增任务，任务名只会有一个
-        String taskName = notifySendDto.getTaskName();
-
-        // 插入到数据库
-        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
-        NotifyMapper mapper = sqlSession.getMapper(NotifyMapper.class);
-        try {
-            // 循环插入
-            for (int i = 0; i < userNames.size(); i++) {
-                notifyAddDto.setContent(userNames.get(i) + " 你好，你的导师发布了新任务：" + taskName);
                 notifyAddDto.setUserId(userIds.get(i));
                 mapper.insertForTypeAdd(notifyAddDto);
             }
@@ -357,7 +357,79 @@ public class NotifyServiceImpl implements NotifyService {
      * 发送修改类型的邮件
      * */
     private void sendEmailForUpdate (NotifyEmailDto notifyEmailDto) {
+        // 获取修改前的分配用户ID集合
+        Set<Integer> beforeIds = Arrays.stream(notifyEmailDto.getBeforeAssignedUserId().split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
 
+        // 获取当前分配用户ID集合
+        Set<Integer> currentIds = Arrays.stream(notifyEmailDto.getTaskAssignedUserId().split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+
+
+        // 求修改前和修改后的id区别——发送删除的通知
+        List<Integer> idsForDelete = beforeIds.stream()
+                .filter(i -> !currentIds.contains(i))
+                .collect(Collectors.toList());
+
+        // 求 修改后比修改前 新增加了的ID——发送新增的通知
+        List<Integer> idsForAdd = currentIds.stream()
+                .filter(i -> !beforeIds.contains(i))
+                .collect(Collectors.toList());
+
+        // 求修改前和修改后的交集——发送修改的通知
+        Set<Integer> intersectionSet = new HashSet<>(beforeIds);
+        intersectionSet.retainAll(currentIds);
+        List<Integer> idsForUpdate = new ArrayList<>(intersectionSet);
+
+        /*
+         * 获取需要发送不同类型通知的用户名和邮件
+         * */
+        // 新增类型通知的用户名
+        List<NameAndEmailDto> nameAndEmailForAdd = new ArrayList<>();
+        if (!idsForAdd.isEmpty()) {
+            nameAndEmailForAdd = userMapper.getNameAndEmailsByIds(idsForAdd);
+        }
+        // 删除类型通知的用户名
+        List<NameAndEmailDto> nameAndEmailForDelete = new ArrayList<>();
+        if (!idsForDelete.isEmpty()) {
+            nameAndEmailForDelete = userMapper.getNameAndEmailsByIds(idsForDelete);
+        }
+        // 更新类型通知的用户名
+        List<NameAndEmailDto> nameAndEmailForUpdate = userMapper.getNameAndEmailsByIds(idsForUpdate);
+
+        // 更新任务只会有一个任务名
+        String taskName = notifyEmailDto.getTaskName().get(0);
+
+        // 构造新增的content
+        List<String> emailForAdd = new ArrayList<>(nameAndEmailForAdd.size());
+        List<String> contentForAdd = new ArrayList<>(nameAndEmailForAdd.size());
+        for (NameAndEmailDto nameAndEmail : nameAndEmailForAdd) {
+            contentForAdd.add(nameAndEmail.getName() + " 你好，你的导师将你添加到了任务：" + taskName);
+            emailForAdd.add(nameAndEmail.getEmail());
+        }
+
+        // 构造删除的content
+        List<String> emailForDelete = new ArrayList<>(nameAndEmailForDelete.size());
+        List<String> contentForDelete = new ArrayList<>(nameAndEmailForDelete.size());
+        for (NameAndEmailDto nameAndEmail : nameAndEmailForDelete) {
+            contentForDelete.add(nameAndEmail.getName() + " 你好，你的导师将你添加到了任务：" + taskName);
+            emailForDelete.add(nameAndEmail.getEmail());
+        }
+
+        // 构造修改的content
+        List<String> emailForUpdate = new ArrayList<>(nameAndEmailForUpdate.size());
+        List<String> contentForUpdate = new ArrayList<>(nameAndEmailForUpdate.size());
+        for (NameAndEmailDto nameAndEmail : nameAndEmailForUpdate) {
+            contentForUpdate.add(nameAndEmail.getName() + " 你好，你的导师将你添加到了任务：" + taskName);
+            emailForUpdate.add(nameAndEmail.getEmail());
+        }
+
+        // 发送邮件
+        mailService.sendSimpleMail(MailConstant.FROM, emailForAdd.toArray(new String[0]), MailConstant.SUBJECT_ADD, contentForAdd);
+        mailService.sendSimpleMail(MailConstant.FROM, emailForDelete.toArray(new String[0]), MailConstant.SUBJECT_DELETE, contentForDelete);
+        mailService.sendSimpleMail(MailConstant.FROM, emailForUpdate.toArray(new String[0]), MailConstant.SUBJECT_UPDATE, contentForUpdate);
     }
 
     @Override

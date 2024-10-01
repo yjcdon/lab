@@ -24,4 +24,7 @@ public class NotifyEmailDto {
 
     @ApiModelProperty("邮件类型")
     private Integer emailType;
+
+    @ApiModelProperty("修改前已分配的用户ID，仅用于修改通知")
+    private String beforeAssignedUserId;
 }
