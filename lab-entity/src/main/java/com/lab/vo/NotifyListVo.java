@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 public class NotifyListVo {
+    @ApiModelProperty("通知记录的主键ID")
+    private Integer id;
+
     @ApiModelProperty("通知内容")
     private String content;
 

@@ -436,6 +436,16 @@ public class NotifyServiceImpl implements NotifyService {
     public Page<NotifyListVo> list (NotifyListDto notifyListDto) {
         PageHelper.startPage(notifyListDto.getPageNum(), notifyListDto.getPageSize());
         List<NotifyListVo> list = notifyMapper.list(notifyListDto);
+
+        // 把查询到的通知的 isLook 字段改为 1
+        if (!list.isEmpty()) {
+            List<Integer> notifyIds = new ArrayList<>(list.size());
+            for (NotifyListVo vo : list) {
+                notifyIds.add(vo.getId());
+            }
+            notifyMapper.updateIsLook(notifyIds);
+        }
+
         return PageUtil.toPage(list);
     }
 

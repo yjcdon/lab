@@ -23,4 +23,6 @@ public interface NotifyMapper {
     Integer delete (@Param("ids") List<Integer> ids);
 
     Integer getIsNotLookCount (@Param("id") Integer userId);
+
+    void updateIsLook (@Param("ids") List<Integer> notifyIds);
 }
