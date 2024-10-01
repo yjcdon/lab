@@ -31,13 +31,18 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
             "/task/delete",
             "/task/update",
             "/task/notify",
+
+            "/taskTag/add",
+            "/taskTag/delete",
+            "/taskTag/update"
     };
 
     // 拦截的路径
     private static final String[] INTERCEPT_PATH = {
             "/user/**",
             "/task/**",
-            "/notify/**"
+            "/notify/**",
+            "/taskTag/**"
     };
 
 

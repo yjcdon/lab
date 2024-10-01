@@ -5,4 +5,30 @@
 <mapper namespace="com.lab.mapper.TaskTagMapper">
 
 
+    <insert id="add">
+        insert into task_tag(task_tag_name)
+        values (#{name})
+    </insert>
+    <update id="update">
+        update task_tag
+        set task_tag_name = #{name}
+        where id = #{id}
+    </update>
+    <select id="list" resultType="com.lab.vo.NameAndCodeVo">
+        select id as code, task_tag_name as name
+        from task_tag
+    </select>
+
+    <delete id="delete">
+        delete from task_tag
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
 </mapper>

@@ -81,7 +81,7 @@
         tp.task_type_name AS taskTypeName,
         tg.task_tag_name AS taskTagName,
         t.create_user_id AS createUserId,
-        t.begin_time  AS beginTime,
+        t.begin_time AS beginTime,
         t.end_time AS endTime
 
         FROM task t
@@ -127,6 +127,20 @@
         <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
+    </select>
+    <select id="getTaskRelativeWithTaskTag" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM task t
+        LEFT JOIN task_tag tg ON t.task_tag_id = tg.id
+        <where>
+            t.is_delete = 0
+            <if test="ids != null and ids.size() > 0">
+                and tg.id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
     </select>
 
 

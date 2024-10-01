@@ -28,4 +28,7 @@ public interface TaskMapper {
     List<String> getTaskNamesByIds (@Param("ids") List<Integer> taskIds);
 
     List<String> getTaskAssignedUserIds (@Param("ids") List<Integer> taskIds);
+
+    int getTaskRelativeWithTaskTag (@Param("ids") List<Integer> ids);
+
 }
