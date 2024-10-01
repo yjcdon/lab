@@ -22,6 +22,8 @@ public class TaskTypeServiceImpl implements TaskTypeService {
 
     @Override
     public Integer add (String name) {
+        checkNameExist(name);
+
         return taskTypeMapper.add(name);
     }
 
@@ -40,6 +42,7 @@ public class TaskTypeServiceImpl implements TaskTypeService {
 
     @Override
     public boolean update (Integer id, String name) {
+        checkNameExist(name);
         return taskTypeMapper.update(id, name);
     }
 
@@ -48,5 +51,12 @@ public class TaskTypeServiceImpl implements TaskTypeService {
         PageHelper.startPage(pageNum, pageSize);
         List<NameAndCodeVo> list = taskTypeMapper.list();
         return PageUtil.toPage(list);
+    }
+
+    private void checkNameExist (String name) {
+        int count = taskTypeMapper.getCountByName(name);
+        if (count > 0) {
+            throw new BusinessException("该标签名字已存在！");
+        }
     }
 }

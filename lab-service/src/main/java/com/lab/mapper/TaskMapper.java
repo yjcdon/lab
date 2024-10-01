@@ -32,4 +32,6 @@ public interface TaskMapper {
     int getTaskTagRelativeWithTaskTag (@Param("ids") List<Integer> ids);
 
     int getTaskTypeRelativeWithTaskTag (@Param("ids") List<Integer> ids);
+
+    int getCountByName (@Param("name") String taskName);
 }

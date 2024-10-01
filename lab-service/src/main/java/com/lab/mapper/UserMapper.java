@@ -1,7 +1,6 @@
 package com.lab.mapper;
 
 import com.lab.dto.*;
-import com.lab.service.impl.NotifyServiceImpl;
 import com.lab.vo.UserListVo;
 import com.lab.vo.UserSingleVo;
 import org.apache.ibatis.annotations.Param;

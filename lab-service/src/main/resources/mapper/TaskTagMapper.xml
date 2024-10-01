@@ -18,6 +18,11 @@
         select id as code, task_tag_name as name
         from task_tag
     </select>
+    <select id="getCountByName" resultType="java.lang.Integer">
+        select count(*)
+        from task_tag
+        where task_tag_name = #{name}
+    </select>
 
     <delete id="delete">
         delete from task_tag

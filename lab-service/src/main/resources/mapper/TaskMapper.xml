@@ -156,6 +156,11 @@
             </if>
         </where>
     </select>
+    <select id="getCountByName" resultType="java.lang.Integer">
+        select count(*)
+        from task
+        where task_name = #{name} and is_delete = 0
+    </select>
 
 
 </mapper>

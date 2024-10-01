@@ -50,7 +50,7 @@ public class NotifyController {
         return count != null ? Response.success("删除成功") : Response.error("删除失败");
     }
 
-    @ApiOperation("查询未查看过的通知个数")
+    @ApiOperation("查询未查看过的通知个数-如果不为0，则弹出气泡作为任务提醒")
     @GetMapping("/getIsNotLookCount")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "x-auth-token", value = "登录token", required = true, dataType = "string", paramType = "header")

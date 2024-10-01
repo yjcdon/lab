@@ -22,6 +22,7 @@ public class TaskTagServiceImpl implements TaskTagService {
 
     @Override
     public Integer add (String name) {
+        checkNameExist(name);
         return taskTagMapper.add(name);
     }
 
@@ -40,6 +41,7 @@ public class TaskTagServiceImpl implements TaskTagService {
 
     @Override
     public boolean update (Integer id, String name) {
+        checkNameExist(name);
         return taskTagMapper.update(id, name);
     }
 
@@ -48,5 +50,12 @@ public class TaskTagServiceImpl implements TaskTagService {
         PageHelper.startPage(pageNum, pageSize);
         List<NameAndCodeVo> list = taskTagMapper.list();
         return PageUtil.toPage(list);
+    }
+
+    private void checkNameExist (String name) {
+        int count = taskTagMapper.getCountByName(name);
+        if (count > 0) {
+            throw new BusinessException("该标签名字已存在！");
+        }
     }
 }

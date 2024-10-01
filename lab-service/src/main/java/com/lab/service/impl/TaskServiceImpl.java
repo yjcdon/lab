@@ -3,10 +3,10 @@ package com.lab.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.lab.constant.MqConstant;
 import com.lab.dto.*;
+import com.lab.exception.BusinessException;
 import com.lab.mapper.TaskMapper;
 import com.lab.mapper.UserMapper;
 import com.lab.response.Page;
-import com.lab.service.MailService;
 import com.lab.service.TaskService;
 import com.lab.utils.PageUtil;
 import com.lab.utils.UserUtil;
@@ -33,6 +33,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Integer add (TaskAddDto taskAddDto) {
+        checkNameExist(taskAddDto.getTaskName());
+
         // 得到SQL影响行数
         Integer count = taskMapper.add(taskAddDto);
 
@@ -98,6 +100,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean update (TaskUpdateDto taskUpdateDto) {
+        checkNameExist(taskUpdateDto.getTaskName());
+
         // 修改任务可能会增减用户，所以这里提前查出来原来分配的ID
         String beforeIds = taskMapper.getTaskAssignedUserIds(Collections.singletonList(taskUpdateDto.getId())).get(0);
 
@@ -208,5 +212,11 @@ public class TaskServiceImpl implements TaskService {
         return PageUtil.toPage(list);
     }
 
+    private void checkNameExist (String name) {
+        int count = taskMapper.getCountByName(name);
+        if (count > 0) {
+            throw new BusinessException("该任务名已存在！");
+        }
+    }
 
 }

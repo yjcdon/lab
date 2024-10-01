@@ -3,8 +3,6 @@ package com.lab.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class NotifyAddDto {
     @ApiModelProperty("消息具体内容")

@@ -18,4 +18,6 @@ public interface TaskTypeMapper {
     Integer delete (@Param("ids") List<Integer> ids);
 
     boolean update (@Param("id") Integer id, @Param("name") String name);
+
+    int getCountByName (@Param("name") String name);
 }
