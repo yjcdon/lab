@@ -1,6 +1,7 @@
 package com.lab.interceptor;
 
 import com.lab.dto.UserAuthDto;
+import com.lab.exception.AuthException;
 import com.lab.utils.UserUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,7 +18,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 不是导师，拦截指定请求
         if (dto.getIsTutor() == 0) {
             response.setStatus(403); // 无权限执行
-            return false;
+            throw new AuthException("无权限执行！");
         }
         return true;
     }
