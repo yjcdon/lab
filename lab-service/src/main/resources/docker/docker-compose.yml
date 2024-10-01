@@ -1,0 +1,86 @@
+services:
+  mysql:
+    container_name: mysql # 容器名
+    image: mysql:5.7 # 指定镜像
+    ports:
+      - 3306:3306 # 占用宿主机和容器内的端口
+    networks:
+      - lab
+    volumes:
+      - "./mysql/data:/var/lib/mysql" # 持久化
+      - "./mysql/my.cnf:/etc/my.cnf" # 挂载 my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=root # root 用户密码
+      - TZ=Asia/Shanghai # 指定时区为东八区
+    privileged: true # 让容器内的 root 用户拥有最高权限
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"] # 指定编码格式，5.7的默认编码格式还不是 utf8
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.27
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+     - lab
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf" # 挂载 nginx.conf
+      - "./nginx/html:/usr/share/nginx/html" # 挂载 HTML 目录
+      - "./nginx/logs:/var/log/nginx" # 挂载 logs 目录
+    environment:
+      - TZ=Asia/Shanghai
+    privileged: true
+
+  redis:
+    container_name: redis
+    image: redis:7.4
+    ports:
+      - 6379:6379
+    networks:
+      - lab
+    volumes:
+      - "./redis/redis.conf:/etc/redis/redis.conf" # 挂载 redis.conf
+      - "./redis/data:/data" # 持久化
+    environment:
+      - TZ=Asia/Shanghai
+    privileged: true
+    command: ["redis-server", "/etc/redis/redis.conf", "--appendonly", "yes", "--requirepass", "123456"] # 启动时指定 Redis 的配置文件，开启 AOF 功能，指定密码 123456
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.13.6-management
+    hostname: lab # 这个可以任意取名，但是每次启动容器都必须相同，否则数据会消失
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - lab
+    volumes:
+      - "./rabbitmq/data:/var/lib/rabbitmq" # 持久化，需要配合上面的 hostname
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=lab # 创建一个 vhost
+      - RABBITMQ_DEFAULT_USER=lab # 创建默认用户
+      - RABBITMQ_DEFAULT_PASS=lab # 默认用户密码
+      - TZ=Asia/Shanghai
+    privileged: true
+
+  lab:
+    container_name: lab
+    image: lab:1.0
+    ports:
+      - 8888:8888
+    networks:
+      - lab
+    build:
+      context: ./backend #指定Dockerfile在哪个目录，相对于 docker-compose.yml 文件
+      dockerfile: Dockerfile #指定Dockerfile文件的名字
+    privileged: true
+    depends_on:
+      - rabbitmq
+      - redis
+      - mysql
+
+# 没有网络会创建，有了网络会使用
+networks:
+  lab:
+    name: lab

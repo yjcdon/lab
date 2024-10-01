@@ -18,7 +18,7 @@ lab:
   mq:
     host: rabbitmq
     port: 5672
-    virtualHost: /lab
+    virtualHost: lab
     username: lab
     password: lab
   mail:
