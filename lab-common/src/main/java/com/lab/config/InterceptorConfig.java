@@ -34,7 +34,11 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
 
             "/taskTag/add",
             "/taskTag/delete",
-            "/taskTag/update"
+            "/taskTag/update",
+
+            "/taskType/add",
+            "/taskType/delete",
+            "/taskType/update"
     };
 
     // 拦截的路径
@@ -42,7 +46,8 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
             "/user/**",
             "/task/**",
             "/notify/**",
-            "/taskTag/**"
+            "/taskTag/**",
+            "/taskType/**"
     };
 
 

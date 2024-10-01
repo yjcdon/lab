@@ -128,7 +128,7 @@
             #{id}
         </foreach>
     </select>
-    <select id="getTaskRelativeWithTaskTag" resultType="java.lang.Integer">
+    <select id="getTaskTagRelativeWithTaskTag" resultType="java.lang.Integer">
         SELECT COUNT(*)
         FROM task t
         LEFT JOIN task_tag tg ON t.task_tag_id = tg.id
@@ -136,6 +136,20 @@
             t.is_delete = 0
             <if test="ids != null and ids.size() > 0">
                 and tg.id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getTaskTypeRelativeWithTaskTag" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM task t
+        LEFT JOIN task_type tp ON t.task_type_id = tp.id
+        <where>
+            t.is_delete = 0
+            <if test="ids != null and ids.size() > 0">
+                and tp.id in
                 <foreach collection="ids" item="id" separator="," open="(" close=")">
                     #{id}
                 </foreach>

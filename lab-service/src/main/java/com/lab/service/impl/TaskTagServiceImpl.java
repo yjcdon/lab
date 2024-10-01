@@ -11,7 +11,6 @@ import com.lab.vo.NameAndCodeVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,7 +31,7 @@ public class TaskTagServiceImpl implements TaskTagService {
     @Override
     public Integer delete (List<Integer> ids) {
         // 传入的是task_tag的ID，需要根据它查出是否有关联的任务
-        int count = taskMapper.getTaskRelativeWithTaskTag(ids);
+        int count = taskMapper.getTaskTagRelativeWithTaskTag(ids);
         if (count > 0) {
             throw new BusinessException("有任务关联标签，无法删除！");
         }
