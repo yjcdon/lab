@@ -451,7 +451,11 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public NotifySingleVo getById (Integer id) {
-        return notifyMapper.getById(id);
+        NotifySingleVo vo = notifyMapper.getById(id);
+        if (vo != null) {
+            notifyMapper.updateIsLook(Collections.singletonList(id));
+        }
+        return vo;
     }
 
     @Override
