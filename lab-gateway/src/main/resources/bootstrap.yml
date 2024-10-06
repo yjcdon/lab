@@ -1,0 +1,17 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: lab-gateway # 服务名称
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.88.137:8848 # nacos地址
+
+    gateway:
+      routes:
+        - id: lab-service
+          uri: lb://lab-service
+          predicates:
+            - Path=/**
