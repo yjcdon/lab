@@ -14,6 +14,12 @@ import org.springframework.stereotype.Component;
 @Log4j2
 public class RabbitMQConfig {
 
+    // 这个就算没用也必须有，不然消息发不出去
+    @Bean
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter () {
+        return new Jackson2JsonMessageConverter(new ObjectMapper());
+    }
+
     @Bean
     public RabbitTemplate createRabbitTemplate (ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate();

@@ -14,7 +14,6 @@
         <module>lab-service</module>
         <module>lab-feign</module>
         <module>lab-gateway</module>
-        <module>lab-auth</module>
     </modules>
 
     <properties>
@@ -58,6 +57,11 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
     </dependencies>
 

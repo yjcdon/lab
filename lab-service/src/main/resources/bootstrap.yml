@@ -8,21 +8,8 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.88.137:8848
-
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 5000
-        readTimeout: 5000
-        loggerLevel: basic
-   # 配置请求和响应压缩
-  compression:
-    request:
-      enabled: true
-      # The list of supported mime types.
-      mime-types: text/xml,application/xml,application/json
-      # The minimum threshold content size.
-      min-request-size: 2048
-    response:
-      enabled: true
+      config:
+        server-addr: 192.168.88.137:8848
+        file-extension: yml
+        prefix: ${spring.application.name}
+        shared-configs: common.yml,lab-feign.yml
