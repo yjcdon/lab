@@ -414,7 +414,7 @@ public class NotifyServiceImpl implements NotifyService {
         List<String> emailForDelete = new ArrayList<>(nameAndEmailForDelete.size());
         List<String> contentForDelete = new ArrayList<>(nameAndEmailForDelete.size());
         for (NameAndEmailDto nameAndEmail : nameAndEmailForDelete) {
-            contentForDelete.add(nameAndEmail.getName() + " 你好，你的导师将你添加到了任务：" + taskName);
+            contentForDelete.add(nameAndEmail.getName() + " 你好，你的导师将你移出了任务：" + taskName);
             emailForDelete.add(nameAndEmail.getEmail());
         }
 
@@ -422,7 +422,7 @@ public class NotifyServiceImpl implements NotifyService {
         List<String> emailForUpdate = new ArrayList<>(nameAndEmailForUpdate.size());
         List<String> contentForUpdate = new ArrayList<>(nameAndEmailForUpdate.size());
         for (NameAndEmailDto nameAndEmail : nameAndEmailForUpdate) {
-            contentForUpdate.add(nameAndEmail.getName() + " 你好，你的导师将你添加到了任务：" + taskName);
+            contentForUpdate.add(nameAndEmail.getName() + " 你好，你的导师修改了任务：" + taskName);
             emailForUpdate.add(nameAndEmail.getEmail());
         }
 
